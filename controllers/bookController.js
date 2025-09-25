@@ -1,7 +1,10 @@
+const Book = require("../models/bookModel");
+
 //fetch all books
 async function getAllBooks(req, res) {
   try {
-    res.send("Get all books");
+    const getAllBooks = await Book.find();
+    res.status(200).json(getAllBooks);
   } catch (error) {
     console.log(error);
   }
@@ -10,36 +13,52 @@ async function getAllBooks(req, res) {
 // Get a book by ID
 async function getBook(req, res) {
   try {
-    res.send("Get a book by ID");
+    const { id } = req.params;
+    const book = await Book.findById(id);
+    res.status(200).json({ data: book });
   } catch (error) {
-    console.log(error);
+    res.json(error);
   }
 }
 
 // Create a new book
 async function createBook(req, res) {
   try {
-    res.send("Book created");
+    const { title, author, genre, price, isStock } = req.body;
+    const newBook = { title, author, genre, price, isStock };
+    await Book.create(newBook);
+    res.status(201).json({ data: newBook });
   } catch (error) {
-    console.log(error);
+    res.json(error);
   }
 }
 
 // update the book
 async function updateBook(req, res) {
   try {
-    res.send("Book updated");
+    const { id } = req.params;
+    const { title, author, genre, price, isStock } = req.body;
+    const updatedBook = { title, author, genre, price, isStock };
+    console.log(id);
+
+    await Book.findByIdAndUpdate(id, updatedBook, {
+      new: true,
+    });
+    res.status(200).json({ data: updatedBook });
   } catch (error) {
-    console.log(error);
+    res.json(error);
   }
 }
 
 // delete the book
 async function deleteBook(req, res) {
   try {
-    res.send("Book deleted");
+    const { id } = req.params;
+
+    await Book.deleteOne({ _id: id });
+    res.json({ status: true, message: "Book Deleted" });
   } catch (error) {
-    console.log(error);
+    res.json(error);
   }
 }
 
