@@ -2,6 +2,9 @@ const express = require("express");
 const dotenv = require("dotenv");
 const userRouter = require("./routes/userRoutes");
 const bookRouter = require("./routes/bookRoutes");
+const connectDB = require("./config/db");
+
+connectDB();
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
