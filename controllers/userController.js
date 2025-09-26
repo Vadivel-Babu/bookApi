@@ -6,6 +6,11 @@ const getToken = require("../utils/generateToken");
 async function userRegister(req, res) {
   try {
     const { name, email, password } = req.body;
+    if (!email.length || !password.length || !name.length) {
+      return res
+        .status(400)
+        .json({ message: "Email or password or name cannot be empty" });
+    }
     const isValidmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!isValidmail.test(email)) {
       return res.status(400).json({ message: "Invalid Email Format" });
@@ -26,7 +31,9 @@ async function userRegister(req, res) {
       });
     }
   } catch (error) {
-    res.json(error);
+    res.status(404).json({
+      message: "An internal server error occurred.",
+    });
   }
 }
 
@@ -56,7 +63,9 @@ async function userLogin(req, res) {
       token,
     });
   } catch (error) {
-    res.json(error);
+    res.status(404).json({
+      message: "An internal server error occurred.",
+    });
   }
 }
 
