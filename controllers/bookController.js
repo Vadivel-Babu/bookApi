@@ -6,7 +6,7 @@ async function getAllBooks(req, res) {
     const getAllBooks = await Book.find();
     res.status(200).json({ status: true, data: getAllBooks });
   } catch (error) {
-    res.status(404).json({
+    res.status(500).json({
       status: false,
       message: "An internal server error occurred.",
     });
@@ -19,11 +19,13 @@ async function getBook(req, res) {
     const { id } = req.params;
     const book = await Book.findById(id);
     if (!book) {
-      res.status(400).json({ status: false, message: "Book cannot found" });
+      return res
+        .status(400)
+        .json({ status: false, message: "Book cannot found" });
     }
     res.status(200).json({ status: true, data: book });
   } catch (error) {
-    res.status(404).json({
+    res.status(500).json({
       status: false,
       message: "An internal server error occurred.",
     });
@@ -37,7 +39,7 @@ async function createBook(req, res) {
     console.log(title, author, genre, price, inStock);
 
     if (!title.trim().length || !author.trim().length || !genre.trim().length) {
-      res.status(400).json({
+      return res.status(400).json({
         status: false,
         message: "All fields are required",
       });
@@ -46,9 +48,7 @@ async function createBook(req, res) {
     await Book.create(newBook);
     res.status(201).json({ status: true, data: newBook });
   } catch (error) {
-    console.log(error);
-
-    res.status(404).json({
+    res.status(500).json({
       status: false,
       message: "An internal server error occurred.",
     });
@@ -60,14 +60,14 @@ async function updateBook(req, res) {
   try {
     const { id } = req.params;
     const { title, author, genre, price, inStock } = req.body;
-    if (
-      !title.trim().length ||
-      !author.trim().length ||
-      !genre.trim().length ||
-      isNaN(price) ||
-      !inStock.length
-    ) {
-      res.status(400).json({
+    const book = await Book.findById(id);
+    if (!book) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Book cannot found" });
+    }
+    if (!title.trim().length || !author.trim().length || !genre.trim().length) {
+      return res.status(400).json({
         status: false,
         message: "All fields are required",
       });
@@ -77,9 +77,9 @@ async function updateBook(req, res) {
     await Book.findByIdAndUpdate(id, updatedBook, {
       new: true,
     });
-    res.status(200).json({ status: true, data: updatedBook });
+    res.status(201).json({ status: true, data: updatedBook });
   } catch (error) {
-    res.status(404).json({
+    res.status(500).json({
       status: false,
       message: "An internal server error occurred.",
     });
@@ -90,10 +90,14 @@ async function updateBook(req, res) {
 async function deleteBook(req, res) {
   try {
     const { id } = req.params;
+    const book = await Book.findById(id);
+    if (!book) {
+      res.status(400).json({ status: false, message: "Book cannot found" });
+    }
     await Book.deleteOne({ _id: id });
     res.json({ status: true, message: "Book Deleted" });
   } catch (error) {
-    res.status(404).json({
+    res.status(500).json({
       status: false,
       message: "An internal server error occurred.",
     });

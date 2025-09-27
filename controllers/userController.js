@@ -6,19 +6,11 @@ const getToken = require("../utils/generateToken");
 async function userRegister(req, res) {
   try {
     const { name, email, password } = req.body;
-    if (!email.length || !password.length || !name.length) {
-      return res
-        .status(400)
-        .json({ message: "Email or password or name cannot be empty" });
-    }
-    const isValidmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!isValidmail.test(email)) {
-      return res.status(400).json({ message: "Invalid Email Format" });
-    }
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ name, email });
     if (user) {
-      return res.json({
-        message: "Email already exsist",
+      return res.status(409).json({
+        status: false,
+        message: "User already exsist",
       });
     }
 
@@ -26,12 +18,16 @@ async function userRegister(req, res) {
       const hashpassword = await bcrypt.hash(password, 10);
       const newUser = new User({ name, email, password: hashpassword });
       await newUser.save();
-      return res.status(201).json({
+      res.status(201).json({
+        status: true,
         message: "sigin succesfully",
       });
     }
   } catch (error) {
-    res.status(404).json({
+    console.log(error);
+
+    res.status(500).json({
+      status: false,
       message: "An internal server error occurred.",
     });
   }
@@ -41,29 +37,35 @@ async function userRegister(req, res) {
 async function userLogin(req, res) {
   try {
     const { email, password } = req.body;
-    if (!email.length || !password.length) {
-      return res
-        .status(400)
-        .json({ message: "Email or password cannot be empty" });
-    }
+    // if (!email.length || !password.length) {
+    //   return res
+    //     .status(400)
+    //     .json({ status: false, message: "Email or password cannot be empty" });
+    // }
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: "User not exisist" });
+      return res
+        .status(404)
+        .json({ status: false, message: "User not exisist" });
     }
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res.status(401).json({ message: "Incorrect Password" });
+      return res
+        .status(401)
+        .json({ status: false, message: "Incorrect Password" });
     }
 
     const token = getToken(user._id);
 
     res.status(201).json({
+      status: true,
       message: "login successsfully",
       token,
     });
   } catch (error) {
-    res.status(404).json({
+    res.status(500).json({
+      status: false,
       message: "An internal server error occurred.",
     });
   }

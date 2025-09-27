@@ -7,22 +7,23 @@ const auth = async (req, res, next) => {
 
   if (token) {
     try {
-      token = req.headers.authorization.split(" ")[1];
-
+      //token = req.headers.authorization.split(" ")[1];
       const decode = jwt.verify(token, process.env.JWT_KEY);
 
       const user = await User.findById(decode.id).select("-password");
       if (!user) {
-        return res.status(400).json({ message: "User not found" });
+        return res
+          .status(400)
+          .json({ status: false, message: "User not found" });
       }
       req.user = user;
       next();
     } catch (error) {
-      res.status(401).json({ message: "Not authorized" });
+      res.status(401).json({ status: false, message: "Not authorized" });
     }
   }
   if (!token) {
-    return res.status(401).json({ message: "No token" });
+    return res.status(401).json({ status: false, message: "No token" });
   }
 };
 

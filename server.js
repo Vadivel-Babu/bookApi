@@ -5,11 +5,11 @@ const bookRouter = require("./routes/bookRoutes");
 const connectDB = require("./config/db");
 const rateLimit = require("express-rate-limit");
 
-connectDB();
 dotenv.config();
+connectDB();
 const app = express();
 const limiter = rateLimit({
-  max: 10,
+  max: 3,
   windowMs: 60 * 60 * 1000,
   message: "We received too many request from this IP",
 });
