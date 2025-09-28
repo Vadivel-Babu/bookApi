@@ -7,7 +7,6 @@ const auth = async (req, res, next) => {
 
   if (token) {
     try {
-      //token = req.headers.authorization.split(" ")[1];
       const decode = jwt.verify(token, process.env.JWT_KEY);
 
       const user = await User.findById(decode.id).select("-password");
@@ -19,7 +18,8 @@ const auth = async (req, res, next) => {
       req.user = user;
       next();
     } catch (error) {
-      res.status(401).json({ status: false, message: "Not authorized" });
+      console.error(error);
+      return res.status(401).json({ status: false, message: "Not authorized" });
     }
   }
   if (!token) {

@@ -8,13 +8,15 @@ const rateLimit = require("express-rate-limit");
 dotenv.config();
 connectDB();
 const app = express();
+
+app.use(express.json());
+//rate limiter
 const limiter = rateLimit({
-  max: 3,
+  max: 30,
   windowMs: 60 * 60 * 1000,
   message: "We received too many request from this IP",
 });
 const port = process.env.PORT || 3000;
-app.use(express.json());
 app.use("/api", limiter);
 
 app.use("/api/users", userRouter);

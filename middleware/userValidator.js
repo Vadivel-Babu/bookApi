@@ -1,4 +1,4 @@
-async function validateUser(req, res, next) {
+function validateUser(req, res, next) {
   const { name, email, password } = req.body;
 
   if (name !== undefined && !name.trim().length) {

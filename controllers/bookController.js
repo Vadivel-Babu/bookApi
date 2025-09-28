@@ -4,9 +4,10 @@ const Book = require("../models/bookModel");
 async function getAllBooks(req, res) {
   try {
     const getAllBooks = await Book.find();
-    res.status(200).json({ status: true, data: getAllBooks });
+    return res.status(200).json({ status: true, data: getAllBooks });
   } catch (error) {
-    res.status(500).json({
+    console.error(error);
+    return res.status(500).json({
       status: false,
       message: "An internal server error occurred.",
     });
@@ -23,9 +24,10 @@ async function getBook(req, res) {
         .status(400)
         .json({ status: false, message: "Book cannot found" });
     }
-    res.status(200).json({ status: true, data: book });
+    return res.status(200).json({ status: true, data: book });
   } catch (error) {
-    res.status(500).json({
+    console.error(error);
+    return res.status(500).json({
       status: false,
       message: "An internal server error occurred.",
     });
@@ -36,19 +38,12 @@ async function getBook(req, res) {
 async function createBook(req, res) {
   try {
     const { title, author, genre, price, inStock } = req.body;
-    console.log(title, author, genre, price, inStock);
-
-    if (!title.trim().length || !author.trim().length || !genre.trim().length) {
-      return res.status(400).json({
-        status: false,
-        message: "All fields are required",
-      });
-    }
     const newBook = { title, author, genre, price, inStock };
     await Book.create(newBook);
-    res.status(201).json({ status: true, data: newBook });
+    return res.status(201).json({ status: true, data: newBook });
   } catch (error) {
-    res.status(500).json({
+    console.error(error);
+    return res.status(500).json({
       status: false,
       message: "An internal server error occurred.",
     });
@@ -66,20 +61,16 @@ async function updateBook(req, res) {
         .status(400)
         .json({ status: false, message: "Book cannot found" });
     }
-    if (!title.trim().length || !author.trim().length || !genre.trim().length) {
-      return res.status(400).json({
-        status: false,
-        message: "All fields are required",
-      });
-    }
+
     const updatedBook = { title, author, genre, price, inStock };
 
     await Book.findByIdAndUpdate(id, updatedBook, {
       new: true,
     });
-    res.status(201).json({ status: true, data: updatedBook });
+    return res.status(201).json({ status: true, data: updatedBook });
   } catch (error) {
-    res.status(500).json({
+    console.error(error);
+    return res.status(500).json({
       status: false,
       message: "An internal server error occurred.",
     });
@@ -92,12 +83,15 @@ async function deleteBook(req, res) {
     const { id } = req.params;
     const book = await Book.findById(id);
     if (!book) {
-      res.status(400).json({ status: false, message: "Book cannot found" });
+      return res
+        .status(400)
+        .json({ status: false, message: "Book cannot found" });
     }
     await Book.deleteOne({ _id: id });
-    res.json({ status: true, message: "Book Deleted" });
+    return res.json({ status: true, message: "Book Deleted" });
   } catch (error) {
-    res.status(500).json({
+    console.error(error);
+    return res.status(500).json({
       status: false,
       message: "An internal server error occurred.",
     });

@@ -8,7 +8,7 @@ async function connectDB() {
     });
     console.log("db connected " + con.connection.host);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     process.exit(1);
   }
 }
