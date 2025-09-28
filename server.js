@@ -9,8 +9,8 @@ dotenv.config();
 connectDB();
 const app = express();
 
-app.use(express.json());
 app.set("trust proxy", 1);
+app.use(express.json());
 //rate limiter
 const limiter = rateLimit({
   max: 30,
